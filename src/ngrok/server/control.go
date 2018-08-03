@@ -291,10 +291,12 @@ func (c *Control) stopper() {
 	c.conn.Info("Shutdown complete")
 }
 
-func (c *Control) RegisterProxy(conn conn.Conn) {
+func (c *Control) RegisterProxy(conn conn.Conn,timeout bool) {
 	conn.AddLogPrefix(c.id)
 
-	conn.SetDeadline(time.Now().Add(proxyStaleDuration))
+	if timeout{
+		conn.SetDeadline(time.Now().Add(proxyStaleDuration))
+	}
 	select {
 	case c.proxies <- conn:
 		conn.Info("Registered")

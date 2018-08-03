@@ -99,6 +99,7 @@ type ReqProxy struct {
 // connection to the server and sends a RegProxy message.
 type RegProxy struct {
 	ClientId string
+	LongConnect bool // 区分http / tcp , 是否长链接
 }
 
 // This message is sent by the server to the client over a *proxy* connection before it

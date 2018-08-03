@@ -10,6 +10,7 @@ import (
 	"os"
 	"runtime/debug"
 	"time"
+	"fmt"
 )
 
 const (
@@ -25,6 +26,8 @@ var (
 	// XXX: kill these global variables - they're only used in tunnel.go for constructing forwarding URLs
 	opts      *Options
 	listeners map[string]*conn.Listener
+
+	tcpRegKey string
 )
 
 func NewProxy(pxyConn conn.Conn, regPxy *msg.RegProxy) {
@@ -39,6 +42,9 @@ func NewProxy(pxyConn conn.Conn, regPxy *msg.RegProxy) {
 	// set logging prefix
 	pxyConn.SetType("pxy")
 
+
+	fmt.Println("接受到链接.....",regPxy.ClientId)
+
 	// look up the control connection for this proxy
 	pxyConn.Info("Registering new proxy for %s", regPxy.ClientId)
 	ctl := controlRegistry.Get(regPxy.ClientId)
@@ -47,7 +53,7 @@ func NewProxy(pxyConn conn.Conn, regPxy *msg.RegProxy) {
 		panic("No client found for identifier: " + regPxy.ClientId)
 	}
 
-	ctl.RegisterProxy(pxyConn)
+	ctl.RegisterProxy(pxyConn,!regPxy.LongConnect)
 }
 
 // Listen for incoming control and proxy connections
@@ -134,6 +140,10 @@ func Main() {
 	// listen for https
 	if opts.httpsAddr != "" {
 		listeners["https"] = startHttpListener(opts.httpsAddr, tlsConfig)
+	}
+
+	if opts.tcpAddr != ""{
+		listeners["tcp"] = startTcpListener(opts.tcpAddr)
 	}
 
 	// ngrok clients

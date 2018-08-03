@@ -356,7 +356,16 @@ func (c *ClientModel) proxy() {
 	}
 	defer remoteConn.Close()
 
-	err = msg.WriteMsg(remoteConn, &msg.RegProxy{ClientId: c.id})
+	lc := false
+	for k,_ := range c.protoMap{
+		fmt.Println(k)
+		if k == "tcp" {
+			lc = true
+			break
+		}
+	}
+
+	err = msg.WriteMsg(remoteConn, &msg.RegProxy{ClientId: c.id,LongConnect:lc})
 	if err != nil {
 		remoteConn.Error("Failed to write RegProxy: %v", err)
 		return

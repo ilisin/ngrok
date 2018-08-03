@@ -40,6 +40,8 @@ func Main() {
 		os.Exit(1)
 	}
 
+	fmt.Println(*config)
+
 	// seed random number generator
 	seed, err := util.RandomSeed()
 	if err != nil {
